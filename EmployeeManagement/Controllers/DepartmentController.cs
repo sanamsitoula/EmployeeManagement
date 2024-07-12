@@ -1,11 +1,13 @@
 ﻿using EmployeeManagement.Data;
 using EmployeeManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.Controllers
 {
-   public class DepartmentsController : Controller
+    [Authorize(Roles = "Admin")]
+    public class DepartmentsController : Controller
         {
             private readonly AppDbContext _context;
 
