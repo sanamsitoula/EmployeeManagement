@@ -1,0 +1,115 @@
+﻿@model List<Employee>
+
+<h1>Employee List</h1>
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* Adjust spacing between cards */
+    }
+
+    .card {
+        width: calc(25% - 20px); /* 25% width minus spacing */
+        /* Other card styling properties */
+    }
+</style>
+<p>
+    <button class="btn btn-primary" id="btnCreate">Add New Employee</button>
+</p>
+<div class="card-container">
+    @foreach (var employee in Model)
+    {
+        <div class="card">
+            <div class="card-header">
+                <h3>@employee.FullName</h3>
+            </div>
+            <div class="card-body">
+                <img src="@employee.Document" alt="Employee Photo">
+                <p>Email: @employee.Email</p>
+                <p>Mobile Number: @employee.MobileNumber</p>
+                <p>Department: @employee.Department.Name</p>
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-info btn-sm btnEdit" data-id="@employee.Id">Edit</button>
+                <button class="btn btn-danger btn-sm btnDelete" data-id="@employee.Id">Delete</button>
+            </div>
+        </div>
+    }
+</div>
+@* 
+<div id="employeeList">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Mobile Number</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in Model)
+            {
+                <tr>
+                    <td>@employee.FullName</td>
+                    <td>@employee.Email</td>
+                    <td>@employee.MobileNumber</td>
+                    <td>@employee.Department.Name</td>
+                    <td>
+                        <button class="btn btn-info btn-sm btnEdit" data-id="@employee.Id">Edit</button>
+                        <button class="btn btn-danger btn-sm btnDelete" data-id="@employee.Id">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div> *@
+
+<div id="modalContainer"></div>
+
+@section Scripts {
+    <script>
+        // AJAX functions for loading partial views
+        $(document).ready(function () {
+            $("#btnCreate").click(function () {
+                $.get('@Url.Action("Create", "Employees")', function (data) {
+                    $('#modalContainer').html(data);
+                    $('#modalContainer .modal').modal('show');
+                });
+            });
+
+            $(".btnEdit").click(function () {
+                var id = $(this).data("id");
+                $.get('@Url.Action("Edit", "Employees")' + '/' + id, function (data) {
+                    $('#modalContainer').html(data);
+                    $('#modalContainer .modal').modal('show');
+                });
+            });
+
+            $(".btnDelete").click(function () {
+                var id = $(this).data("id");
+                $.get('@Url.Action("Delete", "Employees")' + '/' + id, function (data) {
+                    $('#modalContainer').html(data);
+                    $('#modalContainer .modal').modal('show');
+                });
+            });
+
+            // Handle form submission within modal
+            $('#modalContainer').on('submit', 'form', function () {
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'),
+                    data: form.serialize(),
+                    success: function (data) {
+                        $('#modalContainer').html(data);
+                        $('#modalContainer .modal').modal('show');
+                        $('#employeeList').load('/Employees/Index #employeeList');
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+}
